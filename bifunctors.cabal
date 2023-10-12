@@ -1,8 +1,8 @@
 name:          bifunctors
 category:      Data, Functors
-version:       5.5.7
+version:       5.5.13
 license:       BSD3
-cabal-version: >= 1.8
+cabal-version: >= 1.10
 license-file:  LICENSE
 author:        Edward A. Kmett
 maintainer:    Edward A. Kmett <ekmett@gmail.com>
@@ -23,10 +23,11 @@ tested-with:   GHC == 7.0.4
              , GHC == 8.2.2
              , GHC == 8.4.4
              , GHC == 8.6.5
-             , GHC == 8.8.1
-             , GHC == 8.10.1
+             , GHC == 8.8.4
+             , GHC == 8.10.7
+             , GHC == 9.0.2
+             , GHC == 9.2.2
 extra-source-files:
-  .travis.yml
   CHANGELOG.markdown
   README.markdown
   include/bifunctors-common.h
@@ -56,25 +57,25 @@ library
   include-dirs: include
   includes: bifunctors-common.h
   build-depends:
-    base                >= 4     && < 5,
-    base-orphans        >= 0.5.2 && < 1,
-    comonad             >= 4     && < 6,
-    containers          >= 0.1   && < 0.7,
-    template-haskell    >= 2.4   && < 2.17,
-    th-abstraction      >= 0.3   && < 0.4,
-    transformers        >= 0.2   && < 0.6
+    base                >= 4.3   && < 5,
+    base-orphans        >= 0.8.4 && < 1,
+    comonad             >= 5.0.7 && < 6,
+    containers          >= 0.2   && < 0.7,
+    template-haskell    >= 2.4   && < 2.20,
+    th-abstraction      >= 0.4.2.0 && < 0.5,
+    transformers        >= 0.3   && < 0.7
 
   if !impl(ghc > 8.2)
-    build-depends: transformers-compat >= 0.5 && < 0.7
+    build-depends: transformers-compat >= 0.5 && < 0.8
 
   if !impl(ghc >= 8.0)
     build-depends: fail == 4.9.*
 
   if flag(tagged)
-    build-depends: tagged >= 0.7.3 && < 1
+    build-depends: tagged >= 0.8.6 && < 1
 
   if flag(semigroups) && !impl(ghc >= 8.0)
-    build-depends: semigroups >= 0.8.3.1 && < 1
+    build-depends: semigroups >= 0.18.5 && < 1
 
   if impl(ghc<7.9)
     hs-source-dirs: old-src/ghc709
@@ -110,14 +111,22 @@ library
     Paths_bifunctors
 
   ghc-options: -Wall
+  default-language: Haskell2010
 
+  if impl(ghc >= 9.0)
+    -- these flags may abort compilation with GHC-8.10
+    -- https://gitlab.haskell.org/ghc/ghc/-/merge_requests/3295
+    ghc-options: -Winferred-safe-imports -Wmissing-safe-haskell-mode
 
 test-suite bifunctors-spec
   type: exitcode-stdio-1.0
   hs-source-dirs: tests
   main-is: Spec.hs
-  other-modules: BifunctorSpec
+  other-modules: BifunctorSpec T89Spec
   ghc-options: -Wall
+  if impl(ghc >= 8.6)
+    ghc-options: -Wno-star-is-type
+  default-language: Haskell2010
   build-tool-depends: hspec-discover:hspec-discover >= 1.8
   build-depends:
     base                >= 4   && < 5,

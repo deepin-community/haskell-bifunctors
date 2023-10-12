@@ -10,10 +10,11 @@
 {-# LANGUAGE DeriveGeneric              #-}
 #endif
 
-#include "bifunctors-common.h"
-#ifndef MIN_VERSION_semigroups
-#define MIN_VERSION_semigroups(x,y,z) 0
+-- This module uses GND
+#if __GLASGOW_HASKELL__ >= 702
+{-# LANGUAGE Trustworthy #-}
 #endif
+#include "bifunctors-common.h"
 
 -----------------------------------------------------------------------------
 -- |
@@ -47,9 +48,7 @@ import Data.Monoid
 import Data.Traversable
 #endif
 
-#if MIN_VERSION_base(4,9,0) || MIN_VERSION_semigroups(0,16,2)
 import qualified Data.Semigroup as S
-#endif
 
 -- | Pointwise lifting of a class over two arguments, using
 -- 'Biapplicative'.

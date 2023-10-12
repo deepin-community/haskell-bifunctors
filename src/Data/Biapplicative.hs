@@ -7,9 +7,6 @@
 {-# LANGUAGE Trustworthy #-}
 #endif
 
-#ifndef MIN_VERSION_semigroups
-#define MIN_VERSION_semigroups(x,y,z) 0
-#endif
 -----------------------------------------------------------------------------
 -- |
 -- Copyright   :  (C) 2011-2015 Edward Kmett
@@ -42,9 +39,7 @@ import Data.Monoid
 import Data.Traversable (Traversable (traverse))
 #endif
 
-#if MIN_VERSION_base(4,9,0) || MIN_VERSION_semigroups(0,16,2)
 import Data.Semigroup (Arg(..))
-#endif
 
 #ifdef MIN_VERSION_tagged
 import Data.Tagged
@@ -178,7 +173,7 @@ smash p m = go m m
     go (Map f x) (Map g y) = bimap f g (go x y)
     go (Ap fs xs) (Ap gs ys) = go fs gs <<*>> go xs ys
 #if MIN_VERSION_base(4,10,0)
-    go (LiftA2 f xs ys) (LiftA2 g zs ws) = bimap f g (go xs zs) <<*>> go ys ws
+    go (LiftA2 f xs ys) (LiftA2 g zs ws) = biliftA2 f g (go xs zs) (go ys ws)
 #endif
     go (One x) (One _) = p x
     go _ _ = impossibleError
@@ -273,12 +268,11 @@ traverseBiaPair f (x,y) = bimap ((,) x) ((,) x) (f y)
 instance Biapplicative (,) where
   bipure = (,)
   {-# INLINE bipure #-}
-  (f, g) <<*>> (a, b) = (f a, g b)
+  ~(f, g) <<*>> ~(a, b) = (f a, g b)
   {-# INLINE (<<*>>) #-}
-  biliftA2 f g (x, y) (a, b) = (f x a, g y b)
+  biliftA2 f g ~(x, y) ~(a, b) = (f x a, g y b)
   {-# INLINE biliftA2 #-}
 
-#if MIN_VERSION_base(4,9,0) || MIN_VERSION_semigroups(0,16,2)
 instance Biapplicative Arg where
   bipure = Arg
   {-# INLINE bipure #-}
@@ -286,36 +280,35 @@ instance Biapplicative Arg where
   {-# INLINE (<<*>>) #-}
   biliftA2 f g (Arg x y) (Arg a b) = Arg (f x a) (g y b)
   {-# INLINE biliftA2 #-}
-#endif
 
 instance Monoid x => Biapplicative ((,,) x) where
   bipure = (,,) mempty
   {-# INLINE bipure #-}
-  (x, f, g) <<*>> (x', a, b) = (mappend x x', f a, g b)
+  ~(x, f, g) <<*>> ~(x', a, b) = (mappend x x', f a, g b)
   {-# INLINE (<<*>>) #-}
 
 instance (Monoid x, Monoid y) => Biapplicative ((,,,) x y) where
   bipure = (,,,) mempty mempty
   {-# INLINE bipure #-}
-  (x, y, f, g) <<*>> (x', y', a, b) = (mappend x x', mappend y y', f a, g b)
+  ~(x, y, f, g) <<*>> ~(x', y', a, b) = (mappend x x', mappend y y', f a, g b)
   {-# INLINE (<<*>>) #-}
 
 instance (Monoid x, Monoid y, Monoid z) => Biapplicative ((,,,,) x y z) where
   bipure = (,,,,) mempty mempty mempty
   {-# INLINE bipure #-}
-  (x, y, z, f, g) <<*>> (x', y', z', a, b) = (mappend x x', mappend y y', mappend z z', f a, g b)
+  ~(x, y, z, f, g) <<*>> ~(x', y', z', a, b) = (mappend x x', mappend y y', mappend z z', f a, g b)
   {-# INLINE (<<*>>) #-}
 
 instance (Monoid x, Monoid y, Monoid z, Monoid w) => Biapplicative ((,,,,,) x y z w) where
   bipure = (,,,,,) mempty mempty mempty mempty
   {-# INLINE bipure #-}
-  (x, y, z, w, f, g) <<*>> (x', y', z', w', a, b) = (mappend x x', mappend y y', mappend z z', mappend w w', f a, g b)
+  ~(x, y, z, w, f, g) <<*>> ~(x', y', z', w', a, b) = (mappend x x', mappend y y', mappend z z', mappend w w', f a, g b)
   {-# INLINE (<<*>>) #-}
 
 instance (Monoid x, Monoid y, Monoid z, Monoid w, Monoid v) => Biapplicative ((,,,,,,) x y z w v) where
   bipure = (,,,,,,) mempty mempty mempty mempty mempty
   {-# INLINE bipure #-}
-  (x, y, z, w, v, f, g) <<*>> (x', y', z', w', v', a, b) = (mappend x x', mappend y y', mappend z z', mappend w w', mappend v v', f a, g b)
+  ~(x, y, z, w, v, f, g) <<*>> ~(x', y', z', w', v', a, b) = (mappend x x', mappend y y', mappend z z', mappend w w', mappend v v', f a, g b)
   {-# INLINE (<<*>>) #-}
 
 #ifdef MIN_VERSION_tagged
