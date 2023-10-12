@@ -1,3 +1,37 @@
+5.5.13 [2022.09.12]
+-------------------
+* Make the `Biapplicative` instances for tuples lazy, to match their `Bifunctor`
+  instances.
+
+5.5.12 [2022.05.07]
+-------------------
+* Backport an upstream GHC change which removes the default implementation of
+  `bitraverse`. Per the discussion in
+  https://github.com/haskell/core-libraries-committee/issues/47, this default
+  implementation was completely broken, as attempting to use it would always
+  result in an infinite loop.
+
+5.5.11 [2021.04.30]
+-------------------
+* Allow building with `template-haskell-2.18` (GHC 9.2).
+
+5.5.10 [2021.01.21]
+-------------------
+* Fix a bug in which `deriveBifoldable` could generate code that triggers
+  `-Wunused-matches` warnings.
+
+5.5.9 [2020.12.30]
+------------------
+* Explicitly mark modules as Safe or Trustworthy.
+
+5.5.8 [2020.10.01]
+------------------
+* Fix a bug in which `deriveBifunctor` would fail on sufficiently complex uses
+  of rank-n types in constructor fields.
+* Fix a bug in which `deriveBiunctor` and related functions would needlessly
+  reject data types whose two last type parameters appear as oversaturated
+  arguments to a type family.
+
 5.5.7 [2020.01.29]
 ------------------
 * Add `Data.Bifunctor.Biap`.
